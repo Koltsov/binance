@@ -53,13 +53,13 @@ module Binance
       end
 
       def faraday_proxy_uri
-        # if Rails.env.development? || Rails.env.test?
-        #   nil
-        # else
+        if Rails.env.development? || Rails.env.test?
+          nil
+        else
           ip = Rails.application.secrets[:load_balancer_ip]
           port = Rails.application.secrets[:load_balancer_port]
           ip && port ? "http://#{ip}:#{port}" : nil
-        # end
+        end
       end
 
     end
