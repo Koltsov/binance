@@ -8,6 +8,7 @@ module Binance
           conn.request :json
           conn.response :json, content_type: /\bjson$/
           conn.adapter adapter
+          conn.proxy = faraday_proxy_uri if faraday_proxy_uri
         end
       end
 
@@ -16,6 +17,7 @@ module Binance
           conn.response :json, content_type: /\bjson$/
           conn.headers['X-MBX-APIKEY'] = api_key
           conn.adapter adapter
+          conn.proxy = faraday_proxy_uri if faraday_proxy_uri
         end
       end
 
@@ -27,6 +29,7 @@ module Binance
           conn.use TimestampRequestMiddleware
           conn.use SignRequestMiddleware, secret_key
           conn.adapter adapter
+          conn.proxy = faraday_proxy_uri if faraday_proxy_uri
         end
       end
 
@@ -48,6 +51,17 @@ module Binance
           conn.adapter adapter
         end
       end
+
+      def faraday_proxy_uri
+        # if Rails.env.development? || Rails.env.test?
+        #   nil
+        # else
+          ip = Rails.application.secrets[:load_balancer_ip]
+          port = Rails.application.secrets[:load_balancer_port]
+          ip && port ? "http://#{ip}:#{port}" : nil
+        # end
+      end
+
     end
   end
 end
